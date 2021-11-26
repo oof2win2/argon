@@ -1,55 +1,42 @@
-#[macro_use]
-extern crate diesel;
+// #[macro_use]
 extern crate dotenv;
 
-use diesel::prelude::*;
-use diesel::sqlite::SqliteConnection;
-use dotenv::dotenv;
-use std::env;
-use base32;
-
-// use ootp::constants::*;
-use totp_rs::{Algorithm, TOTP};
-use std::time::SystemTime;
-
 pub mod models;
-pub mod schema;
-use self::models::*;
-use self::schema::services::dsl::services;
+pub mod database;
+pub mod functions;
 
-pub fn establish_connection() -> SqliteConnection {
-    dotenv().ok();
+use rusqlite::{Connection};
+use dotenv::dotenv;
+use self::database::{init_db,createService,fetchService,removeService};
+use self::functions::{encode, decode, generate_totp};
 
-    let database_url = env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set");
-    SqliteConnection::establish(&database_url)
-        .expect(&format!("Error connecting to {}", database_url))
-}
-
-/**
- * Generate a TOTP string from a base32 encoded secret
- */
-fn generate_totp(secret: &Vec<u8>) -> String {
-	let totp = TOTP::new(
-		Algorithm::SHA1,
-		6,
-		1,
-		30,
-		secret,
-	);
-	let time = SystemTime::now()
-		.duration_since(SystemTime::UNIX_EPOCH).unwrap()
-		.as_secs();
-	let otp = totp.generate(time);
-	return otp
+pub fn establish_connection(path: &str) -> Connection {
+	return Connection::open(&path)
+			.expect("DB Connection not opened successfully");
 }
 
 fn main() {
-	let input = "DG4ERUOUMURJHI77I4HZW53WUFMRNUNG";
-	let result = base32::decode(base32::Alphabet::RFC4648{padding: true}, input).unwrap();
-	for i in 1..result.len() {
-		print!("{:#x} ", result[i]);
+	dotenv().ok();
+	let connection = establish_connection(&dotenv::var("DATABASE_URL").unwrap_or(String::from("./database.sqlite")));
+	init_db(&connection);
+
+	let input = decode("HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ");
+	if input.is_none() {
+		println!("decoding failed");
+		std::process::exit(1);
 	}
-	println!("");
-	println!("{}", generate_totp(&result));
+	createService(&connection, input.unwrap());
+	let res = fetchService(&connection, &1);
+	
+	if res.is_some() {
+		let safe = res.unwrap();
+		for code in &safe.secret {
+			print!("{:#}", code)
+		}
+		println!("is the hex for {}", safe.id);
+		println!("{} is the secret, the TOTP code is {}", encode(&safe.secret), generate_totp(&safe.secret))
+	} else {
+		println!("No service found");
+	}
+
 }
