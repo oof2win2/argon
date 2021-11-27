@@ -1,9 +1,11 @@
-// #[macro_use]
+#[macro_use]
+extern crate tokio;
 extern crate dotenv;
 
 pub mod models;
 pub mod database;
 pub mod functions;
+pub mod backend;
 
 use rusqlite::{Connection};
 use dotenv::dotenv;
@@ -15,28 +17,19 @@ pub fn establish_connection(path: &str) -> Connection {
 			.expect("DB Connection not opened successfully");
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
 	dotenv().ok();
 	let connection = establish_connection(&dotenv::var("DATABASE_URL").unwrap_or(String::from("./database.sqlite")));
 	init_db(&connection);
-
-	let input = decode("HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ");
-	if input.is_none() {
-		println!("decoding failed");
-		std::process::exit(1);
-	}
-	createService(&connection, input.unwrap());
-	let res = fetchService(&connection, &1);
-	
-	if res.is_some() {
-		let safe = res.unwrap();
-		for code in &safe.secret {
-			print!("{:#}", code)
+	let result = self::backend::getService(&1).await.ok();
+	if result.is_some() {
+		let data = result.unwrap();
+		if data.is_some() {
+			let service = data.unwrap();
+			println!("{:?} {}", service.secret, service.id);
+		} else {
+			println!("no service found")
 		}
-		println!("is the hex for {}", safe.id);
-		println!("{} is the secret, the TOTP code is {}", encode(&safe.secret), generate_totp(&safe.secret))
-	} else {
-		println!("No service found");
 	}
-
 }
