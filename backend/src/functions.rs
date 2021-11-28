@@ -5,8 +5,8 @@ use totp_rs::{Algorithm, TOTP};
 pub fn encode(input: &Vec<u8>) -> String {
     return base32::encode(base32::Alphabet::RFC4648 { padding: false }, input);
 }
-pub fn decode(input: &str) -> Option<Vec<u8>> {
-    return base32::decode(base32::Alphabet::RFC4648 { padding: false }, input);
+pub fn decode(input: &str) -> Vec<u8> {
+    return base32::decode(base32::Alphabet::RFC4648 { padding: false }, input).unwrap();
 }
 
 /**

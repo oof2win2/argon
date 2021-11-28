@@ -37,6 +37,21 @@ pub fn fetch_service(connection: &Connection, id: &i32) -> Option<Service> {
         .ok();
 }
 
+pub fn fetch_services(connection: &Connection) -> Result<Vec<Service>, rusqlite::Error> {
+	let mut stmt = connection.prepare("SELECT * FROM `services`")?;
+    let mut rows = stmt.query([])?;
+
+    let mut data = Vec::new();
+    // let mut dat = Vec::new();
+    while let Some(row) = rows.next()? {
+        data.push(Service {
+            id: row.get::<_, u32>(0)?,
+            secret: row.get::<_, Vec<u8>>(1)?,
+        })
+    }
+	Ok(data)
+}
+
 pub fn remove_service(connection: &Connection, id: &i32) -> bool {
     let dat = connection
         .query_row(

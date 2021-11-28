@@ -7,7 +7,10 @@ edition = "2021"
 
 [dependencies]
 base32 = "0.4.0"
+clap = "2.33.3"
 dotenv = "0.15.0"
+duration-string = "0.0.6"
+indicatif = "0.16.2"
 reqwest = { version = "0.11.6", features = ["json"] }
 rusqlite = "0.26.1"
 serde = { version = "1.0.130", features = ["derive"] }

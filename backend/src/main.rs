@@ -11,7 +11,7 @@ pub mod models;
 pub mod pages;
 
 use self::database::init_db;
-use actix_web::{web, App, HttpServer};
+use actix_web::{web, App, HttpServer, middleware};
 use dotenv::dotenv;
 use r2d2_sqlite::SqliteConnectionManager;
 use rusqlite::Connection;
@@ -33,15 +33,31 @@ async fn main() -> std::io::Result<()> {
     init_db(&connection);
 
     HttpServer::new(move || {
+		// App::new()
+		// 	.data(pool.clone())
+		// 	.service(
+		// 		web::resource("/container/")
+		// 			.route(web::get().to(self::pages::get_services))
+		// 			.route(web::post().to(self::pages::create_service))
+		// 	)
         App::new()
             .data(pool.clone())
+			.wrap(middleware::Logger::default())
+			.wrap(middleware::Compress::default())
             .service(
                 web::scope("/services")
-                    .service(web::resource("").route(web::get().to(self::pages::get_services)))
                     .service(
-                        web::scope("/{id}").service(
-                            web::resource("").route(web::get().to(self::pages::get_service)),
-                        ),
+						web::resource("")
+							.route(web::get().to(self::pages::get_services))
+							.route(web::post().to(self::pages::create_service))
+					)
+                    .service(
+                        web::scope("/{id}")
+							.service(
+								web::resource("")
+									.route(web::get().to(self::pages::get_service))
+									.route(web::delete().to(self::pages::remove_service))
+							)
                     ),
             )
             .default_service(web::resource("").route(web::get().to(self::pages::p404)))
