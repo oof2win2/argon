@@ -1,4 +1,4 @@
-use crate::models::{NewService, Service};
+use crate::models::{Service};
 use rusqlite::{params, Connection};
 
 pub fn init_db(connection: &Connection) {
@@ -13,7 +13,7 @@ pub fn init_db(connection: &Connection) {
         .ok();
 }
 
-pub fn createService(connection: &Connection, secret: Vec<u8>) {
+pub fn create_service(connection: &Connection, secret: Vec<u8>) {
     connection
         .execute(
             "INSERT INTO `services` (secret) VALUES (?1)",
@@ -22,7 +22,7 @@ pub fn createService(connection: &Connection, secret: Vec<u8>) {
         .ok();
 }
 
-pub fn fetchService(connection: &Connection, id: &i32) -> Option<Service> {
+pub fn fetch_service(connection: &Connection, id: &i32) -> Option<Service> {
     return connection
         .query_row(
             "SELECT * FROM `services` WHERE `id` = (?) LIMIT 1",
@@ -37,7 +37,7 @@ pub fn fetchService(connection: &Connection, id: &i32) -> Option<Service> {
         .ok();
 }
 
-pub fn fetchServices(connection: &Connection) -> Result<Vec<Service>, rusqlite::Error> {
+pub fn fetch_services(connection: &Connection) -> Result<Vec<Service>, rusqlite::Error> {
     let mut stmt = connection.prepare("SELECT * FROM `services`")?;
     let mut rows = stmt.query([])?;
 
@@ -52,12 +52,12 @@ pub fn fetchServices(connection: &Connection) -> Result<Vec<Service>, rusqlite::
     Ok(data)
 }
 
-pub fn removeService(connection: &Connection, id: &i32) -> bool {
+pub fn remove_service(connection: &Connection, id: &i32) -> bool {
     let dat = connection
         .query_row(
             "DELETE * FROM `services` WHERE `id` = (?) LIMIT 1",
             [id],
-            |row| Ok(true),
+            |_row| Ok(true),
         )
         .ok();
     if dat.is_some() {

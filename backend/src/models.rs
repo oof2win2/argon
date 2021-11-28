@@ -1,6 +1,6 @@
 use crate::functions::encode;
-use serde::ser::{Serialize, SerializeMap, SerializeSeq, Serializer};
 use serde::ser::SerializeStruct;
+use serde::ser::{Serialize, Serializer};
 
 pub struct Service {
     pub id: u32,
@@ -15,7 +15,7 @@ impl Serialize for Service {
         let mut service = serializer.serialize_struct("Service", 16)?;
         service.serialize_field("id", &self.id)?;
         service.serialize_field("secret", &encode(&self.secret))?;
-        return service.end()
+        return service.end();
     }
 }
 

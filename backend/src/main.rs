@@ -36,19 +36,14 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(pool.clone())
             .service(
-				web::scope("/services")
-					.service(
-						web::resource("")
-							.route(web::get().to(self::pages::getServices)),
-					)
-					.service(
-						web::scope("/{id}")
-							.service(
-								web::resource("")
-									.route(web::get().to(self::pages::getService))	
-							)
-					)
-			)
+                web::scope("/services")
+                    .service(web::resource("").route(web::get().to(self::pages::get_services)))
+                    .service(
+                        web::scope("/{id}").service(
+                            web::resource("").route(web::get().to(self::pages::get_service)),
+                        ),
+                    ),
+            )
             .default_service(web::resource("").route(web::get().to(self::pages::p404)))
     })
     .bind(&dotenv::var("API_URL").unwrap_or(String::from("127.0.0.1:8080")))?
