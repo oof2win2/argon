@@ -19,6 +19,7 @@ pub async fn get_services() -> Result<Vec<Service>, Box<dyn std::error::Error>> 
     for service in resp.services {
         services.push(Service {
             id: service.id,
+			name: service.name,
             secret: decode(&service.secret).unwrap(),
         })
     }
@@ -51,6 +52,7 @@ pub async fn get_service(id: &i32) -> Result<Option<Service>, Box<dyn std::error
         let s = resp.service.unwrap();
         let service = Service {
             id: s.id,
+			name: s.name,
             secret: decode(&s.secret).unwrap(),
         };
         return Ok(Some(service));

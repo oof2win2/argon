@@ -28,6 +28,7 @@ version = "0.1.0"
 dependencies = [
  "base32",
  "clap",
+ "console",
  "dotenv",
  "duration-string",
  "indicatif",
@@ -137,7 +138,9 @@ dependencies = [
  "encode_unicode",
  "libc",
  "once_cell",
+ "regex",
  "terminal_size",
+ "unicode-width",
  "winapi",
 ]
 

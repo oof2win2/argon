@@ -21,3 +21,7 @@ pub fn generate_totp(secret: &Vec<u8>) -> String {
     let otp = totp.generate(time);
     return otp;
 }
+
+pub fn display_service(service: &crate::models::Service) {
+	println!("Service {} ({}): {}", service.name, service.id, encode(&service.secret));
+}

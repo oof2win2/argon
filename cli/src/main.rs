@@ -31,10 +31,10 @@ async fn main() {
 		.version(crate_version!())
 		.about("An app for OTP code management")
 		.arg(
-			Arg::with_name("sync")
-				.help("Synchronize services")
-				.short("s")
-				.long("sync")
+			Arg::with_name("no-sync")
+				.help("Don't synchronize services before other things")
+				.short("ns")
+				.long("no-sync")
 		)
 		.arg(
 			Arg::with_name("get-all")
@@ -50,14 +50,41 @@ async fn main() {
 				.value_name("ID")
 		)
 		.get_matches();
-	if app.value_of("get").is_some() {
-		let value = app.value_of("get").unwrap();
-		println!("value of get is {}", value);
+	
+	// let stdout = console::Term::stdout();
+	// let stderr = console::Term::stderr();
+	// use console::style;
+	
+	// sync stuff first, then do other stuff
+	if !app.is_present("no-sync") {
+		self::commands::synchronize(&connection).await;
+	}
+
+	if app.values_of("get").is_some() {
+		// wants to get a service and display it. can be put in multiple times
+		let ids = app.values_of("get").unwrap();
+		for id_str in ids {
+			let id = id_str.parse::<i32>();
+			if id.is_ok() {
+				let service = self::database::fetch_service(&connection, &id.unwrap()).unwrap();
+				self::functions::display_service(&service);
+			} else {
+				// write a line to stderr that the id is invalid
+				// stderr.write_line(
+				// 	style(&"Flag {value} is an invalid number"
+				// 			.replace("{value}", id_str)).red().toString()
+				// ).ok();
+			}
+		}
 	}
 	if app.is_present("get-all") {
-		println!("get-all is present");
-	}
-	if app.is_present("sync") {
-		self::commands::synchronize(&connection);
+		// wants to get all services and display them
+		let services = self::database::fetch_services(&connection);
+		if services.is_ok() {
+			let services = services.unwrap();
+			for service in services {
+				self::functions::display_service(&service);
+			}
+		}
 	}
 }

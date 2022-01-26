@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 base32 = "0.4.0"
 clap = "2.33.3"
+console = "0.15.0"
 dotenv = "0.15.0"
 duration-string = "0.0.6"
 indicatif = "0.16.2"
