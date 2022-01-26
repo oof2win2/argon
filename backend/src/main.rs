@@ -33,13 +33,6 @@ async fn main() -> std::io::Result<()> {
     init_db(&connection);
 
     HttpServer::new(move || {
-		// App::new()
-		// 	.data(pool.clone())
-		// 	.service(
-		// 		web::resource("/container/")
-		// 			.route(web::get().to(self::pages::get_services))
-		// 			.route(web::post().to(self::pages::create_service))
-		// 	)
         App::new()
             .data(pool.clone())
 			.wrap(middleware::Logger::default())

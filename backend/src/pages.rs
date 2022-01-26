@@ -13,6 +13,7 @@ pub async fn p404() -> HttpResponse {
     }))
 }
 
+// GET /serrvices/
 pub async fn get_services(
     pool: web::Data<r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>>,
 ) -> HttpResponse {
@@ -31,6 +32,7 @@ pub async fn get_services(
     }
 }
 
+// GET /serrvices/:id
 pub async fn get_service(
     pool: web::Data<r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>>,
     id: web::Path<String>,
@@ -48,6 +50,7 @@ pub async fn get_service(
     }
 }
 
+// POST /serrvices/
 pub async fn create_service(
 	pool: web::Data<r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>>,
 	body: web::Json<models::CreateService>,

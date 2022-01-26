@@ -48,12 +48,11 @@ async fn main() {
 				.long("get")
 				.takes_value(true)
 				.value_name("ID")
+				.multiple(true)
 		)
 		.get_matches();
 	
-	// let stdout = console::Term::stdout();
-	// let stderr = console::Term::stderr();
-	// use console::style;
+	use console::style;
 	
 	// sync stuff first, then do other stuff
 	if !app.is_present("no-sync") {
@@ -66,14 +65,26 @@ async fn main() {
 		for id_str in ids {
 			let id = id_str.parse::<i32>();
 			if id.is_ok() {
-				let service = self::database::fetch_service(&connection, &id.unwrap()).unwrap();
-				self::functions::display_service(&service);
+				let fetched = self::database::fetch_service(&connection, &id.unwrap());
+				if fetched.is_some() {
+					let service = fetched.unwrap();
+					self::functions::display_service_totp(&service);
+				} else {
+					println!("{}",
+					style(
+						&"Service with ID {value} does not exist"
+						.replace("{value}", id_str)
+					)
+				);
+				}
 			} else {
 				// write a line to stderr that the id is invalid
-				// stderr.write_line(
-				// 	style(&"Flag {value} is an invalid number"
-				// 			.replace("{value}", id_str)).red().toString()
-				// ).ok();
+				println!("{}",
+					style(
+						&"Value {value} is an invalid numeric ID"
+						.replace("{value}", id_str)
+					)
+				);
 			}
 		}
 	}
@@ -83,7 +94,7 @@ async fn main() {
 		if services.is_ok() {
 			let services = services.unwrap();
 			for service in services {
-				self::functions::display_service(&service);
+				self::functions::display_service_totp(&service);
 			}
 		}
 	}
