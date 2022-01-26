@@ -17,7 +17,6 @@ pub async fn synchronize(db_connection: &Connection) {
 	if fetch.is_ok() {
 		let fetched_services = fetch.ok().unwrap();
 		let db_services = database::fetch_services(db_connection).unwrap();
-		println!("fetched length {}", db_services.len());
 
 		// check if services are existent, if not, create them
 		for service in &fetched_services {
@@ -39,7 +38,7 @@ pub async fn synchronize(db_connection: &Connection) {
 				.replace("{duration}", &d)
 		);
 	} else {
-		pb.finish_with_message("Could not synchronize srevices")
+		pb.finish_with_message("Could not synchronize services")
 	}
 }
 

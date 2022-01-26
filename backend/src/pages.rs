@@ -13,7 +13,7 @@ pub async fn p404() -> HttpResponse {
     }))
 }
 
-// GET /serrvices/
+// GET /services/
 pub async fn get_services(
     pool: web::Data<r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>>,
 ) -> HttpResponse {
@@ -32,7 +32,7 @@ pub async fn get_services(
     }
 }
 
-// GET /serrvices/:id
+// GET /services/:id
 pub async fn get_service(
     pool: web::Data<r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>>,
     id: web::Path<String>,
@@ -50,7 +50,7 @@ pub async fn get_service(
     }
 }
 
-// POST /serrvices/
+// POST /services/
 pub async fn create_service(
 	pool: web::Data<r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>>,
 	body: web::Json<models::CreateService>,
@@ -68,6 +68,7 @@ pub async fn create_service(
     }
 }
 
+// DELETE /services/:id
 pub async fn remove_service(
 	pool: web::Data<r2d2::Pool<r2d2_sqlite::SqliteConnectionManager>>,
     id: web::Path<String>,
@@ -78,3 +79,4 @@ pub async fn remove_service(
 		"removed": removed
 	}))
 }
+
